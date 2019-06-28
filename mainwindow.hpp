@@ -10,8 +10,6 @@
 
 #include <cmath>
 
-#include "ur10.hpp"
-
 const double RAD2DEG = 180.0 / M_PI;
 const double DEG2RAD = M_PI / 180.0;
 
@@ -33,7 +31,6 @@ public slots:
 private slots:
     void on_pushButtonConnect_clicked();
     void on_pushButtonDisconnect_clicked();
-    void onTimer();
 
 private:
     void initializeUi();
@@ -42,9 +39,6 @@ private:
     Ui::MainWindow *ui;
 
     QTcpSocket *client;
-    Ur10RealTimePacket packet;
-
-    QTimer *timer;
 
     QList<QLineEdit *> actualJointPositionEdits;
     QList<QLineEdit *> actualJointVelocityEdits;

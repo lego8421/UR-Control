@@ -15,8 +15,6 @@ MainWindow::MainWindow(QWidget *parent) :
     client = new QTcpSocket(this);
     connect(client, &QTcpSocket::connected, this, &MainWindow::acceptConnection);
     connect(client, &QTcpSocket::disconnected, this, &MainWindow::on_pushButtonDisconnect_clicked);
-
-    timer = new QTimer(this);
 }
 
 MainWindow::~MainWindow() {
@@ -30,17 +28,10 @@ void MainWindow::acceptConnection() {
 
     ui->statusBar->showMessage("connected", 3000);
     connect(client, &QTcpSocket::readyRead, this, &MainWindow::receivedMessage);
-
-    timer->start(100);
-    connect(timer, &QTimer::timeout, this, &MainWindow::onTimer);
 }
 
 void MainWindow::receivedMessage() {
-    QByteArray recv = client->readAll();
-    if (recv.size() == 1108) {
-        std::vector<char> buffer(recv.data(), recv.data() + recv.size());
-        packet = UR10::convert(buffer);
-    }
+
 }
 
 void MainWindow::on_pushButtonConnect_clicked() {
@@ -54,21 +45,6 @@ void MainWindow::on_pushButtonDisconnect_clicked() {
     client->close();
     ui->pushButtonConnect->setEnabled(true);
     ui->pushButtonDisconnect->setEnabled(false);
-    timer->stop();
-}
-
-void MainWindow::onTimer() {
-    if (packet.m_dMsgSize == UR10::PACKET_SIZE) {
-        for (int i = 0; i < 6; i++) {
-            actualJointPositionEdits.at(i)->setText(QString::number(packet.m_fArrQActual[i] * RAD2DEG, 'f', 3));
-            actualJointVelocityEdits.at(i)->setText(QString::number(packet.m_fArrQDActual[i] * RAD2DEG, 'f', 3));
-            actualJointCurrentEdits.at(i)->setText(QString::number(packet.m_fArrIActual[i] * RAD2DEG, 'f', 3));
-
-            actualTcpPositionEdits.at(i)->setText(QString::number(packet.m_fArrToolVectorActual[i], 'f', 3));
-            actualTcpVelocityEdits.at(i)->setText(QString::number(packet.m_fArrTCPSpeedActual[i], 'f', 3));
-            actualTcpForceEdits.at(i)->setText(QString::number(packet.m_fArrTCPForce[i], 'f', 3));
-        }
-    }
 }
 
 void MainWindow::initializeUi() {
